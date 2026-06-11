@@ -30,13 +30,13 @@ MonoBehaviour:
   adaptiveResolution: 0
   stageMode: 0
   videoSeeThrough: 1
-  spatialAnchor: 0
-  sceneCapture: 0
-  sharedAnchor: 0
-  spatialMesh: 0
-  planeDetection: 0
+  spatialAnchor: 1
+  sceneCapture: 1
+  sharedAnchor: 1
+  spatialMesh: 1
+  planeDetection: 1
   secureMR: 0
-  meshLod: 0
+  meshLod: 2
   superResolution: 0
   normalSharpening: 0
   qualitySharpening: 0
