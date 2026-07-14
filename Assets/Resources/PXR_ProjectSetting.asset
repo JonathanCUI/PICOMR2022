@@ -26,7 +26,7 @@ MonoBehaviour:
   latelatching: 0
   latelatchingDebug: 0
   enableSubsampled: 0
-  bodyTracking: 0
+  bodyTracking: 1
   adaptiveResolution: 0
   stageMode: 0
   videoSeeThrough: 1
@@ -36,7 +36,7 @@ MonoBehaviour:
   spatialMesh: 1
   planeDetection: 1
   secureMR: 1
-  meshLod: 2
+  meshLod: 0
   superResolution: 0
   normalSharpening: 0
   qualitySharpening: 0

@@ -16,9 +16,11 @@ public class MinimalApp : MonoBehaviour
     private Pipeline pipeline;
     private Tensor gltfTensor;
     private Tensor gltfPlaceholderTensor;
+
     private void Awake()
     {
         PXR_Manager.EnableVideoSeeThrough = true;
+        //PXR_CameraImage.BeginCameraCapture(PXR_Manager.CameraId);
     }
 
     private void Start()
