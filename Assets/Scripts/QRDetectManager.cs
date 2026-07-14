@@ -7,6 +7,8 @@ using Unity.VisualScripting;
 using Unity.XR.PXR;
 //using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Device;
+using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using ZXing;
 using ZXing.QrCode;
@@ -410,15 +412,22 @@ public class QRDetectManager : MonoBehaviour
         }
 
         // 视口坐标转射线
-        Ray ray = cam.ViewportPointToRay(viewportPoint);
+        Ray ray = cam.ViewportPointToRay(viewportPoint, Camera.MonoOrStereoscopicEye.Mono);
+        ;
+        //Vector2 viewportUV = PXR_Projection.GetViewportUVFromScreenUV(screenUV, PXR_Projection.Eye.Left);
+        //XRdis
+        //XRDisplaySubsystem display = GetComponent<XRDisplaySubsystem>();
         //cam.view
         //PXR_SceneCaptureManager.Instance.Raycast(ray, out RaycastHit hitInfo, 30f, LayerMask.GetMask("SpatialMesh"));
         //PXR_Manager.Instance.Raycast(ray, out RaycastHit hitInfo, 30f, LayerMask.GetMask("SpatialMesh"));
         //Debug.Log("333333333333333");
         //if (!lineRendererInitialized)
         //{
-        //    lineRenderer.SetPosition(0, ray.origin);
-        //    lineRenderer.SetPosition(1, ray.origin + ray.direction * 3f);
+        XRDisplaySubsystem display;
+        //SubsystemManager.GetInstances<XRDisplaySubsystem>(display);
+
+        lineRenderer.SetPosition(0, ray.origin);
+        lineRenderer.SetPosition(1, ray.origin + ray.direction * 0.5f);
         //    Debug.Log("Ray Origin: " + ray.origin + " Ray Direction: " + ray.direction);
         //    lineRendererInitialized = true;
         //}
