@@ -23,7 +23,10 @@ public class QRDetectManager : MonoBehaviour
         public Transform Object;
     }
 
-    [SerializeField] private List<QrCodeTarget> qrCodeTargets = new List<QrCodeTarget>();
+    [SerializeField] 
+    private List<QrCodeTarget> qrCodeTargets = new List<QrCodeTarget>();
+    //private 
+    [SerializeField]
     private Dictionary<string, Transform> qrCodeTragetDic = new Dictionary<string, Transform>();
 
     private BarcodeReader barcodeReader = new BarcodeReader()
@@ -357,6 +360,7 @@ public class QRDetectManager : MonoBehaviour
 
     private Vector2Int GetQrCodeCenter(ResultPoint[] resultPoints, int textureHeight)
     {
+        //Debug.Log("RESULT POINT LENGTH" + resultPoints.Length);
         if (resultPoints == null || resultPoints.Length == 0)
         {
             return Vector2Int.zero;
@@ -397,6 +401,12 @@ public class QRDetectManager : MonoBehaviour
         //    Pose pose = new Pose(hitInfo.point, Quaternion.FromToRotation(Vector3.up, hitInfo.normal));
         //    return pose;
         //}
+
+        //手动纠正视口坐标，确保其在 [0, 1] 范围内
+        viewPoint.x = (viewPoint.x - 0.5f) * 0.6f + 0.5f;
+        viewPoint.y = (viewPoint.y - 0.5f) * 0.6f + 0.5f;
+
+
         return GetHitPoseFromViewportPoint(viewPoint);
     }
 
@@ -423,11 +433,11 @@ public class QRDetectManager : MonoBehaviour
         //Debug.Log("333333333333333");
         //if (!lineRendererInitialized)
         //{
-        XRDisplaySubsystem display;
+        //XRDisplaySubsystem display;
         //SubsystemManager.GetInstances<XRDisplaySubsystem>(display);
 
-        lineRenderer.SetPosition(0, ray.origin);
-        lineRenderer.SetPosition(1, ray.origin + ray.direction * 0.5f);
+        //lineRenderer.SetPosition(0, ray.origin);
+        //lineRenderer.SetPosition(1, ray.origin + ray.direction * 0.5f);
         //    Debug.Log("Ray Origin: " + ray.origin + " Ray Direction: " + ray.direction);
         //    lineRendererInitialized = true;
         //}

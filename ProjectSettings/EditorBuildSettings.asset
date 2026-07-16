@@ -17,9 +17,16 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Samples/XR Hands/1.8.0/HandVisualizer/HandVisualizer.unity
     guid: ab7acf0d9677fbe4db51bc36647d4fcb
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/XR Hands/1.8.0/Hand Capture/HandCapture.unity
     guid: 1ebe1fe45ff8e46c9ac6fdd6bfd9ec73
+  - enabled: 0
+    path: Assets/Scenes/EasyARTest.unity
+    guid: 296a2b229ab37fd4eb38c757203a7922
+  - enabled: 1
+    path: Assets/Scenes/QRCodeScene.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects:
+    EasyAR.Settings: {fileID: 11400000, guid: 8f1a115fce895c74b8a421dd5530d51d, type: 2}
     Unity.XR.PXR.Settings: {fileID: 11400000, guid: ce5a6ee553f51c84a8d2bf298aef7e92, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 64578a7304f727e4c8c191c745fd860f, type: 2}
