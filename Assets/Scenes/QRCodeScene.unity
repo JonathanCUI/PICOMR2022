@@ -342,7 +342,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &425414188
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -649,7 +649,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &576481794
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1355,10 +1355,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   qrCodeTargets:
-  - QrCodeContent: Suscribete
-    Object: {fileID: 576481797}
-  - QrCodeContent: UnityAdventure
-    Object: {fileID: 425414191}
   - QrCodeContent: boy
     Object: {fileID: 208422745}
   - QrCodeContent: girl
@@ -1853,6 +1849,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 93b29ac1dd88d484d91be3586d4687cb, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 580baceac33716f4f8be776a9478caf3, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
