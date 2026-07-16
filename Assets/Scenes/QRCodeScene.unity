@@ -1409,7 +1409,7 @@ GameObject:
   - component: {fileID: 1369098555}
   - component: {fileID: 1369098554}
   m_Layer: 0
-  m_Name: '[Building Block] XR Hand Tracking XR Origin (XR Rig)'
+  m_Name: '[Building Block] PICO Hand Tracking XR Origin (XR Rig)'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
