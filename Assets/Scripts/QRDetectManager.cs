@@ -25,7 +25,6 @@ public class QRDetectManager : MonoBehaviour
 
     [SerializeField] 
     private List<QrCodeTarget> qrCodeTargets = new List<QrCodeTarget>();
-    //private 
     [SerializeField]
     private Dictionary<string, Transform> qrCodeTragetDic = new Dictionary<string, Transform>();
 
@@ -222,11 +221,8 @@ public class QRDetectManager : MonoBehaviour
         {
             //ProcessCameraImageAsync();
             PxrResult acquireResult = PXR_CameraImage.AcquireCameraImage(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, 0, out ulong imageId, out Int64 captureTime);
-            //Debug.Log("AcquireCameraImage Result: " + acquireResult.ToString() + " ImageId: " + imageId + " CaptureTime: " + captureTime);
             if (acquireResult == PxrResult.SUCCESS)
             {
-                //Debug.Log("Get Image Data Success:" + acquireResult.ToString() + " ImageId: " + imageId + " CaptureTime: " + captureTime);
-
                 XrCameraImageDataRawBuffer imageData;
                 if (PXR_CameraImage.GetCameraImageData(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, imageId, out imageData) == PxrResult.SUCCESS)
                 {
@@ -241,17 +237,26 @@ public class QRDetectManager : MonoBehaviour
                             Pose pose = ConvertScreenPointToWorldPoint(qrCodeCenter);
                             obj.SetPositionAndRotation(pose.position, pose.rotation);
                             obj.gameObject.SetActive(true);
-                        }                        
+                            qrCodeTragetDic.Remove(result.Text);
+                        }
                     }
-                }
-                PXR_CameraImage.ReleaseCameraImage(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, imageId);
+                }                
             }
+            PXR_CameraImage.ReleaseCameraImage(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, imageId);
+        }
+        //如果已经通过二维码识别到目标物体，则不再继续处理相机图像
+        if (isBeginCameraCapture && qrCodeTragetDic.Count == 0)
+        {
+            Debug.Log("All QR codes detected, stopping camera capture.");
+            PXR_CameraImage.EndCameraCapture(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
+            PXR_CameraImage.DestroyCameraCaptureSession(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
+            //PXR_CameraImage.DestroyCameraDevice(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
+            isBeginCameraCapture = false;
         }
     }
 
     private void OnDestroy()
     {
-        PXR_CameraImage.DestroyCameraCaptureSession(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
         PXR_CameraImage.DestroyCameraDevice(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
     }
 
@@ -307,7 +312,6 @@ public class QRDetectManager : MonoBehaviour
         return new Vector2Int(
            Mathf.RoundToInt(x),
            Mathf.RoundToInt(textureHeight - y)
-           //Mathf.RoundToInt(y)
         );
         
     }
