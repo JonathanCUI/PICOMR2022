@@ -110,8 +110,8 @@ public class QRDetectManager : MonoBehaviour
     public async void CreateCameraDeviceAsync()
     {
         var result0 = await PXR_CameraImage.CreateCameraDeviceAsync(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
-        Debug.Log("CameraAPITest CreateCameraDeviceAsync result:" + result0);
-        Debug.Log("Create Camera Capture Session");
+        //Debug.Log("CameraAPITest CreateCameraDeviceAsync result:" + result0);
+        //Debug.Log("Create Camera Capture Session");
         CreateCameraCaptureSessionAsync();
     }
 
@@ -126,7 +126,7 @@ public class QRDetectManager : MonoBehaviour
             XrCameraImageFormatPICO.XR_CAMERA_IMAGE_FORMAT_RGBA_8888_PICO, 
             XrCameraDataTransferTypePICO.XR_CAMERA_DATA_TRANSFER_TYPE_RAW_BUFFER_PICO, 
             XrCameraModelPICO.XR_CAMERA_MODEL_PINHOLE_PICO);
-        Debug.Log("CameraAPITest CreateCameraCaptureSessionAsync result:" + result0);
+        //Debug.Log("CameraAPITest CreateCameraCaptureSessionAsync result:" + result0);
         if (result0 == PxrResult.SUCCESS)
         {
             // 开始捕获图像
@@ -143,7 +143,7 @@ public class QRDetectManager : MonoBehaviour
     public void BeginCameraCapture()
     {
         var result0 = PXR_CameraImage.BeginCameraCapture(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
-        Debug.Log("CameraAPITest BeginCameraCapture result:" + result0);
+        //Debug.Log("CameraAPITest BeginCameraCapture result:" + result0);
         isBeginCameraCapture = (result0 == PxrResult.SUCCESS);
         //if (isBeginCameraCapture)
         //{
@@ -161,56 +161,13 @@ public class QRDetectManager : MonoBehaviour
         isBeginCameraCapture = !(result0 == PxrResult.SUCCESS);
     }
 
-
-    private IEnumerator ProcessCameraImageAsync()
-    {
-        // 获取相机图像
-        ulong imageId;
-        PxrResult acquireResult = PXR_CameraImage.AcquireCameraImage(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, 0, out imageId, out Int64 captureTime);
-        Debug.Log("111111111111");
-        Debug.Log("222222222222   " + acquireResult.ToString());
-        if (acquireResult == PxrResult.SUCCESS && imageId > 0)
-        {
-            // 获取图像的原始数据
-            XrCameraImageDataRawBuffer imageData;
-
-            if (PXR_CameraImage.GetCameraImageData(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, imageId, out imageData) == PxrResult.SUCCESS)
-            {
-                // 将原始图像数据渲染到 Texture2D 
-                //imageData.cover
-                //imageData.ConvertTo
-                Debug.Log($"Get Image Data Success: {acquireResult}");
-            }
-
-            // 释放图像资源
-            PXR_CameraImage.ReleaseCameraImage(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, imageId);
-        }
-        else if (acquireResult != PxrResult.SUCCESS)
-        {
-            //UpdateStatus($"获取图像失败: {acquireResult}");
-            Debug.Log($"Get Image Data Failure:" + acquireResult);
-        }
-
-        yield return null;
-    }
-
-
     //data member
-    XrCameraIdPICO cameraId;// = XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO;
     bool isBeginCameraCapture = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.startWidth = 0.05f;
-        lineRenderer.endWidth = 0.05f;
-        lineRendererInitialized = false;
-        if (lineRenderer == null)
-        {
-            Debug.Log("NOT FOUND LINE RENDER");
-        }
-        Debug.Log("Detection Start");
+        //Debug.Log("Detection Start");
         //获取设备上可用的相机 ID 列表
         //GetAvailableCameras();
         //GetCameraPropertyTypesAvailable();
@@ -219,6 +176,7 @@ public class QRDetectManager : MonoBehaviour
         foreach (var qrCodeTarget in qrCodeTargets)
         {
             qrCodeTragetDic.Add(qrCodeTarget.QrCodeContent, qrCodeTarget.Object);
+            qrCodeTarget.Object.gameObject.SetActive(false);
         }
         /*
         PxrResult ret = PXR_CameraImage.GetCameraCapabilityAvailable(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, out XrCameraCapabilityTypePICO[] capabilitys);
@@ -239,7 +197,7 @@ public class QRDetectManager : MonoBehaviour
         }
         */
         //异步创建指定 ID 的相机设备
-        Debug.Log("Create Camera Device");
+        //Debug.Log("Create Camera Device");
         CreateCameraDeviceAsync();
         //PXR_CameraImage.CreateCameraDeviceAsync(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO).ContinueWith(task =>
         //{
@@ -272,53 +230,22 @@ public class QRDetectManager : MonoBehaviour
                 XrCameraImageDataRawBuffer imageData;
                 if (PXR_CameraImage.GetCameraImageData(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, imageId, out imageData) == PxrResult.SUCCESS)
                 {
-                    // 将原始图像数据渲染到 Texture2D 
-                    //Debug.Log("bytes per pixel " + imageData.bytesPerPixel);
-                    //Debug.Log("image width " + imageData.width);
-                    //Debug.Log("image height " + imageData.height);
-                    //Debug.Log("image stride " + imageData.stride);
                     Color32[] camPixels = ConvertRGBA32Safe(imageData);
-                    //cam
-                    //Debug.Log("image data type" + imageData.type);
-                    
-                    //Debug.Log("camPixels length: " + camPixels.Length);
                     var result = barcodeReader.Decode(camPixels, 1280, 960);
 
                     if (result != null)
                     {
-                        //Debug.Log("QR Code Detected: " + result.Text);
-
                         if (qrCodeTragetDic.TryGetValue(result.Text, out Transform obj))
                         {
-                            //Ray ray = passthroughCameraAccess. new Ray(); //= passthroughCameraAccess.GetPassthroughCameraRayFromPixel(centerPixel);
-                            //if (environmentRaycastManager.Raycast(ray, out EnvironmentRaycastHit hitInfo))
-                            //{
-                            //var qrCodeCenter = GetQrCodeCenter(result.ResultPoints, webCamTexture.height);
-                            //Pose pose = ConvertScreenPointToWorldPoint(qrCodeCenter);
-                            //obj.SetPositionAndRotation(pose.position, pose.rotation);
-                            //}
-                            //Debug.Log("QR Code Detected: " + result.Text + " Mapped Object: " + obj.name);
-
                             var qrCodeCenter = GetQrCodeCenter(result.ResultPoints, 960);
-                            //Debug.Log("QR Code Center: " + qrCodeCenter.ToString());
                             Pose pose = ConvertScreenPointToWorldPoint(qrCodeCenter);
                             obj.SetPositionAndRotation(pose.position, pose.rotation);
-
-                        }
-                        //else
-                        //{
-                        //    Debug.Log("No target object mapped for this QR code content.");
-                        //}
+                            obj.gameObject.SetActive(true);
+                        }                        
                     }
                 }
-
-
                 PXR_CameraImage.ReleaseCameraImage(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, imageId);
             }
-            //else
-            //{
-            //    Debug.Log("Get Image Data Failure: {acquireResult}");
-            //}
         }
     }
 
@@ -391,27 +318,14 @@ public class QRDetectManager : MonoBehaviour
             (float)screenPoint.x / 1280,
             (float)screenPoint.y / 960
         );
-        //XRRayInteractor
-        //ConvertScreenPointToWorldPoint
-        //Debug.Log("ViewPoint: " + viewPoint.ToString());
 
-        //Ray ray = PassthroughCameraUtils.ViewportPointToRay(passthroughCameraAccess, viewPoint); //passthroughCameraAccess.GetPassthroughCameraRayFromPixel(screenPoint);
-        //if (environmentRaycastManager.Raycast(ray, out EnvironmentRaycastHit hitInfo))
-        //{
-        //    Pose pose = new Pose(hitInfo.point, Quaternion.FromToRotation(Vector3.up, hitInfo.normal));
-        //    return pose;
-        //}
-
-        //手动纠正视口坐标，确保其在 [0, 1] 范围内
+        //手动纠正视口坐标，确保其在 [0, 1] 范围内，系数0.6
         viewPoint.x = (viewPoint.x - 0.5f) * 0.6f + 0.5f;
         viewPoint.y = (viewPoint.y - 0.5f) * 0.6f + 0.5f;
 
 
         return GetHitPoseFromViewportPoint(viewPoint);
     }
-
-    private LineRenderer lineRenderer;
-    bool lineRendererInitialized = false;
     public Pose GetHitPoseFromViewportPoint(Vector2 viewportPoint)
     {
         Camera cam = Camera.main; // 或通过 XR Origin 获取主相机
@@ -423,44 +337,9 @@ public class QRDetectManager : MonoBehaviour
 
         // 视口坐标转射线
         Ray ray = cam.ViewportPointToRay(viewportPoint, Camera.MonoOrStereoscopicEye.Mono);
-        ;
-        //Vector2 viewportUV = PXR_Projection.GetViewportUVFromScreenUV(screenUV, PXR_Projection.Eye.Left);
-        //XRdis
-        //XRDisplaySubsystem display = GetComponent<XRDisplaySubsystem>();
-        //cam.view
-        //PXR_SceneCaptureManager.Instance.Raycast(ray, out RaycastHit hitInfo, 30f, LayerMask.GetMask("SpatialMesh"));
-        //PXR_Manager.Instance.Raycast(ray, out RaycastHit hitInfo, 30f, LayerMask.GetMask("SpatialMesh"));
-        //Debug.Log("333333333333333");
-        //if (!lineRendererInitialized)
-        //{
-        //XRDisplaySubsystem display;
-        //SubsystemManager.GetInstances<XRDisplaySubsystem>(display);
-
-        //lineRenderer.SetPosition(0, ray.origin);
-        //lineRenderer.SetPosition(1, ray.origin + ray.direction * 0.5f);
-        //    Debug.Log("Ray Origin: " + ray.origin + " Ray Direction: " + ray.direction);
-        //    lineRendererInitialized = true;
-        //}
-        //Debug.DrawRay(ray.origin, ray.direction * 30f, Color.red, 0.1f);
-
-        /*
-        if (Physics.Raycast(ray, out RaycastHit hit, 30f, LayerMask.GetMask("SpatialMesh")))
-        {
-            Vector3 position = hit.point;
-            Debug.Log("HIT WORLD");
-            // 用法线作为物体的前方，适用于大多数放置需求
-            Quaternion rotation = Quaternion.LookRotation(hit.normal, Vector3.up);
-            return new Pose(position, rotation);            
-        }
-        */
-        //if (ray != null)
-        {
-            return new Pose(ray.GetPoint(0.5f), Quaternion.identity);
-        }
-        
-
-        //return Pose.identity; // 未命中任何真实环境表面
+        var pos = ray.GetPoint(0.5f);
+        var dir = cam.transform.position - pos;
+        dir.y = 0; // 保持在水平面上
+        return new Pose(pos, Quaternion.LookRotation(dir));        
     }
-
-
 }
