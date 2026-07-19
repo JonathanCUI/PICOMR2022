@@ -8,6 +8,7 @@ using Unity.XR.PXR;
 //using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Device;
+using UnityEngine.Playables;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using ZXing;
@@ -36,6 +37,7 @@ public class GameManager : MonoBehaviour
     private bool _leftSlotSet;
     private bool _rightSlotSet;
 
+    public PlayableDirector danceShow;
     
     private enum GameState
     {
@@ -44,6 +46,7 @@ public class GameManager : MonoBehaviour
         Prepare,
         PrePerform,
         Performing,
+        Judgement
     }
 
     private GameState _gameState;// = GameState.None;
@@ -284,8 +287,7 @@ public class GameManager : MonoBehaviour
     private void StartPerforming()
     {
         _gameState = GameState.Performing;
-        _boyAvatarController.Dance1();
-        _girlAvatarController.Dance2();
+        danceShow.Play();
     }
     
     private void OnDestroy()
