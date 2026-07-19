@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
     private AvatarController _boyAvatarController;
     [SerializeField]
     private AvatarController _girlAvatarController;
+    [SerializeField]
+    private StageController _stageController;
 
     private bool _leftSlotSet;
     private bool _rightSlotSet;
@@ -295,6 +297,7 @@ public class GameManager : MonoBehaviour
         _gameState = GameState.Performing;
         _boyAvatarController.SetGrabInteractableEnabled(false);
         _girlAvatarController.SetGrabInteractableEnabled(false);
+        _stageController.SetGrabInteractableEnabled(false);
         danceShow.Play();
     }
     

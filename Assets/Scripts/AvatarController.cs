@@ -24,7 +24,6 @@ public class AvatarController : MonoBehaviour
     }
 
 
-
     void Start()
     {
         
