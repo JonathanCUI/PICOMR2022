@@ -254,7 +254,7 @@ MonoBehaviour:
   m_StartingSelectedInteractable: {fileID: 0}
   m_StartingTargetFilter: {fileID: 0}
   m_AutoFindParentInteractableInHierarchy: 0
-  m_ParentInteractableObject: {fileID: 0}
+  m_ParentInteractableObject: {fileID: 2925423654783481743}
   m_HoverEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -279,7 +279,7 @@ MonoBehaviour:
   m_SocketSnappingRadius: 0.1
   m_SocketScaleMode: 2
   m_FixedScale: {x: 1, y: 1, z: 1}
-  m_TargetBoundsSize: {x: 0.05, y: 0.1, z: 0.05}
+  m_TargetBoundsSize: {x: 0.1, y: 0.1, z: 0.1}
 --- !u!65 &4813665905996899750
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -358,7 +358,7 @@ MonoBehaviour:
   m_StartingSelectedInteractable: {fileID: 0}
   m_StartingTargetFilter: {fileID: 0}
   m_AutoFindParentInteractableInHierarchy: 0
-  m_ParentInteractableObject: {fileID: 0}
+  m_ParentInteractableObject: {fileID: 2925423654783481743}
   m_HoverEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -383,7 +383,7 @@ MonoBehaviour:
   m_SocketSnappingRadius: 0.1
   m_SocketScaleMode: 2
   m_FixedScale: {x: 1, y: 1, z: 1}
-  m_TargetBoundsSize: {x: 0.05, y: 0.1, z: 0.05}
+  m_TargetBoundsSize: {x: 0.1, y: 0.1, z: 0.1}
 --- !u!65 &5158098625345890171
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -824,7 +824,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2623601836685277661
 Transform:
   m_ObjectHideFlags: 0

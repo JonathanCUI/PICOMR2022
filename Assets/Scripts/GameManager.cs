@@ -13,7 +13,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using ZXing;
 using ZXing.QrCode;
 
-public class QRDetectManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
 
     [System.Serializable]
@@ -27,6 +27,26 @@ public class QRDetectManager : MonoBehaviour
     private List<QrCodeTarget> qrCodeTargets = new List<QrCodeTarget>();
     [SerializeField]
     private Dictionary<string, Transform> qrCodeTragetDic = new Dictionary<string, Transform>();
+
+    [SerializeField]
+    private AvatarController _boyAvatarController;
+    [SerializeField]
+    private AvatarController _girlAvatarController;
+
+    private bool _leftSlotSet;
+    private bool _rightSlotSet;
+
+    
+    private enum GameState
+    {
+        None,
+        Appear,
+        Prepare,
+        PrePerform,
+        Performing,
+    }
+
+    private GameState _gameState;// = GameState.None;
 
     private BarcodeReader barcodeReader = new BarcodeReader()
     {
@@ -144,12 +164,7 @@ public class QRDetectManager : MonoBehaviour
         var result0 = PXR_CameraImage.BeginCameraCapture(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
         //Debug.Log("CameraAPITest BeginCameraCapture result:" + result0);
         isBeginCameraCapture = (result0 == PxrResult.SUCCESS);
-        //if (isBeginCameraCapture)
-        //{
-            // 开始捕获图像
-        //    Debug.Log("Start Process Camera Image");
-        //    StartCoroutine(ProcessCameraImageAsync());
-        //}
+        _gameState = GameState.Appear;        
     }
 
     //结束指定相机的图像捕获
@@ -163,59 +178,29 @@ public class QRDetectManager : MonoBehaviour
     //data member
     bool isBeginCameraCapture = false;
 
-    // Start is called before the first frame update
-    void Start()
+    private void GameInitialize()
     {
-        //Debug.Log("Detection Start");
-        //获取设备上可用的相机 ID 列表
-        //GetAvailableCameras();
-        //GetCameraPropertyTypesAvailable();
-        //GetCameraFacingProperties();
-        //GetCameraPositionProperties();
+        //将待处理的二维码存入字典，后面调用
         foreach (var qrCodeTarget in qrCodeTargets)
         {
             qrCodeTragetDic.Add(qrCodeTarget.QrCodeContent, qrCodeTarget.Object);
             qrCodeTarget.Object.gameObject.SetActive(false);
         }
-        /*
-        PxrResult ret = PXR_CameraImage.GetCameraCapabilityAvailable(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, out XrCameraCapabilityTypePICO[] capabilitys);
-        if (ret == PxrResult.SUCCESS)
-        {
-            foreach (var capabilityTypePICO in capabilitys)
-            {
-                Debug.Log("CameraAPITest GetCameraCapability:" + capabilityTypePICO);
-            }
-        }
-        ret = PXR_CameraImage.GetCameraImageResolutionCapability(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, out PxrExtent2Di[] resolutions);
-        if (ret == PxrResult.SUCCESS)
-        {
-            foreach (var resolution in resolutions)
-            {
-                Debug.Log("CameraAPITest GetCameraImageResolution:" + resolution.width + " " + resolution.height);
-            }
-        }
-        */
-        //异步创建指定 ID 的相机设备
-        //Debug.Log("Create Camera Device");
-        CreateCameraDeviceAsync();
-        //PXR_CameraImage.CreateCameraDeviceAsync(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO).ContinueWith(task =>
-        //{
-        //    if (task.Result == PxrResult.SUCCESS)
-        //    {
-        //        Debug.Log("Camera device created successfully.");
-        //        Debug.Log("Create Camera Capture Session");
-        //        CreateCameraCaptureSessionAsync();
-        //    }
-        //    else
-        //    {
-        //        Debug.LogError($"Failed to create camera device: {task.Result}");
-        //    }
-        //});
-        //
+        _gameState = GameState.None;
+        _leftSlotSet = false;
+        _rightSlotSet = false;
     }
 
-    // Update is called once per frame
-    void Update()
+    // Start is called before the first frame update
+    void Start()
+    {
+        GameInitialize();        
+
+        //异步创建摄像机，创建成功之后开始捕捉
+        CreateCameraDeviceAsync();
+    }
+
+    private void ProcessCameraImage()
     {
         if (isBeginCameraCapture)
         {
@@ -240,7 +225,7 @@ public class QRDetectManager : MonoBehaviour
                             qrCodeTragetDic.Remove(result.Text);
                         }
                     }
-                }                
+                }
             }
             PXR_CameraImage.ReleaseCameraImage(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO, imageId);
         }
@@ -252,9 +237,57 @@ public class QRDetectManager : MonoBehaviour
             PXR_CameraImage.DestroyCameraCaptureSession(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
             //PXR_CameraImage.DestroyCameraDevice(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
             isBeginCameraCapture = false;
+            _gameState = GameState.Prepare;
         }
     }
 
+    private float _processGapTime = 1f;
+    private float _processGapAccumulate = 0.0f;
+
+    // Update is called once per frame    
+    void Update()
+    {
+        switch (_gameState)
+        {
+            case GameState.None:
+                break;
+            case GameState.Appear:
+                _processGapAccumulate += Time.deltaTime;
+                if (_processGapAccumulate >= _processGapTime)
+                { 
+                    _processGapAccumulate -= _processGapTime;
+                    ProcessCameraImage();
+                }
+                break;
+            case GameState.Prepare:
+                //两个槽位都被设置后，进入预执行状态
+                if (_leftSlotSet && _rightSlotSet)
+                { 
+                    _gameState = GameState.PrePerform;
+                }
+                break;
+            case GameState.PrePerform:
+                //如果有任意一个槽位被清空，则回到准备状态
+                if (!_leftSlotSet || !_rightSlotSet)
+                {
+                    _gameState = GameState.Prepare;
+                }
+                break;
+            case GameState.Performing:
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private void StartPerforming()
+    {
+        _gameState = GameState.Performing;
+        _boyAvatarController.Dance1();
+        _girlAvatarController.Dance2();
+    }
+    
     private void OnDestroy()
     {
         PXR_CameraImage.DestroyCameraDevice(XrCameraIdPICO.XR_CAMERA_ID_RGB_LEFT_PICO);
@@ -292,7 +325,6 @@ public class QRDetectManager : MonoBehaviour
 
     private Vector2Int GetQrCodeCenter(ResultPoint[] resultPoints, int textureHeight)
     {
-        //Debug.Log("RESULT POINT LENGTH" + resultPoints.Length);
         if (resultPoints == null || resultPoints.Length == 0)
         {
             return Vector2Int.zero;
@@ -346,4 +378,78 @@ public class QRDetectManager : MonoBehaviour
         dir.y = 0; // 保持在水平面上
         return new Pose(pos, Quaternion.LookRotation(dir));        
     }
+
+    //手势识别相关
+    public void ShowRightThumbUp()
+    {
+        if (_gameState == GameState.Prepare)
+        {
+            _girlAvatarController.ShowExcited();
+        }
+    }
+
+    public void ShowLeftThumbUp()
+    {
+        if (_gameState == GameState.Prepare)
+        {
+            _boyAvatarController.ShowExcited();
+        }
+    }
+
+    public void ShowRightThumbDown()
+    {
+        Debug.Log("Show Right Thumb Down");
+        if (_gameState == GameState.Prepare)
+        { 
+            _girlAvatarController.ShowLose();
+        }
+    }
+
+    public void ShowLeftThumbDown() 
+    {
+        Debug.Log("Show Left Thumb Down");
+        if (_gameState == GameState.Prepare)
+        {
+            _boyAvatarController.ShowLose();
+        }
+    }
+
+    public void ShowLeftOK() {
+        if (_gameState == GameState.PrePerform)
+        {
+            StartPerforming();
+        }
+    }
+
+    public void ShowRightOK() {
+        if (_gameState == GameState.PrePerform)
+        {
+            StartPerforming();
+        }
+    }
+
+    public void ShowLeftGun()
+    {
+        Debug.Log("Show Left Gun");
+    }
+
+    public void OnLeftSlotEntered()
+    {
+        _leftSlotSet = true;
+    }
+    public void OnLeftSlotExited()
+    {
+        _leftSlotSet = false;
+    }
+
+    public void OnRihtSlotEntered()
+    {
+        _rightSlotSet = true;
+    }
+
+    public void OnRihtSlotExited()
+    {
+        _rightSlotSet = false;
+    }
+
 }
