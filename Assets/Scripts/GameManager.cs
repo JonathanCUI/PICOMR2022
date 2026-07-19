@@ -192,6 +192,12 @@ public class GameManager : MonoBehaviour
         _gameState = GameState.None;
         _leftSlotSet = false;
         _rightSlotSet = false;
+        danceShow.stopped += (PlayableDirector pd) =>
+        {
+            _gameState = GameState.Judgement;
+            //_boyAvatarController.SetGrabInteractableEnabled(true);
+            //_girlAvatarController.SetGrabInteractableEnabled(true);
+        };
     }
 
     // Start is called before the first frame update
@@ -287,6 +293,8 @@ public class GameManager : MonoBehaviour
     private void StartPerforming()
     {
         _gameState = GameState.Performing;
+        _boyAvatarController.SetGrabInteractableEnabled(false);
+        _girlAvatarController.SetGrabInteractableEnabled(false);
         danceShow.Play();
     }
     
@@ -384,7 +392,7 @@ public class GameManager : MonoBehaviour
     //手势识别相关
     public void ShowRightThumbUp()
     {
-        if (_gameState == GameState.Prepare)
+        if (_gameState == GameState.Prepare || _gameState == GameState.Judgement)
         {
             _girlAvatarController.ShowExcited();
         }
@@ -392,7 +400,7 @@ public class GameManager : MonoBehaviour
 
     public void ShowLeftThumbUp()
     {
-        if (_gameState == GameState.Prepare)
+        if (_gameState == GameState.Prepare || _gameState == GameState.Judgement)
         {
             _boyAvatarController.ShowExcited();
         }
@@ -401,7 +409,7 @@ public class GameManager : MonoBehaviour
     public void ShowRightThumbDown()
     {
         Debug.Log("Show Right Thumb Down");
-        if (_gameState == GameState.Prepare)
+        if (_gameState == GameState.Prepare || _gameState == GameState.Judgement)
         { 
             _girlAvatarController.ShowLose();
         }
@@ -410,7 +418,7 @@ public class GameManager : MonoBehaviour
     public void ShowLeftThumbDown() 
     {
         Debug.Log("Show Left Thumb Down");
-        if (_gameState == GameState.Prepare)
+        if (_gameState == GameState.Prepare || _gameState == GameState.Judgement)
         {
             _boyAvatarController.ShowLose();
         }
@@ -428,11 +436,6 @@ public class GameManager : MonoBehaviour
         {
             StartPerforming();
         }
-    }
-
-    public void ShowLeftGun()
-    {
-        Debug.Log("Show Left Gun");
     }
 
     public void OnLeftSlotEntered()
