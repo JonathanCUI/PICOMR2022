@@ -428,14 +428,14 @@ public class GameManager : MonoBehaviour
     }
 
     public void ShowLeftOK() {
-        if (_gameState == GameState.PrePerform)
+        if (_gameState == GameState.PrePerform || _gameState == GameState.Judgement)
         {
             StartPerforming();
         }
     }
 
     public void ShowRightOK() {
-        if (_gameState == GameState.PrePerform)
+        if (_gameState == GameState.PrePerform || _gameState == GameState.Judgement)
         {
             StartPerforming();
         }
