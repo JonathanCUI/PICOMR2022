@@ -41,6 +41,8 @@ public class GameManager : MonoBehaviour
 
     public PlayableDirector danceShow;
     
+    public static GameManager Instance { get; private set; }
+
     private enum GameState
     {
         None,
@@ -202,13 +204,32 @@ public class GameManager : MonoBehaviour
         };
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public bool SpatialAnchorIsStarted = false;
+
+    private void Awake()
     {
-        GameInitialize();        
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
+    // Start is called before the first frame update
+    private async void Start()
+    {
+        GameInitialize();
 
         //异步创建摄像机，创建成功之后开始捕捉
         CreateCameraDeviceAsync();
+
+        //开启空间锚点
+        PxrResult result = await PXR_MixedReality.StartSenseDataProvider(PxrSenseDataProviderType.SpatialAnchor);
+        if (result == PxrResult.SUCCESS)
+        {
+            Debug.Log("StartSenseDataProvider SpatialAnchor success");
+            SpatialAnchorIsStarted = true;
+
+        }
     }
 
     private void ProcessCameraImage()
